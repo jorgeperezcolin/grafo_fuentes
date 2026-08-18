@@ -1,12 +1,30 @@
 # Grafo bibliográfico — IA afecta al decisor
 
-Aplicación Streamlit para explorar el corpus de 17 fuentes priorizadas del proyecto.
+Repositorio del corpus bibliográfico y sus visualizaciones interactivas.
+
+## Entrega principal: HTML5
+
+`index.html` es una versión **autónoma para navegador**. No requiere Python, Streamlit ni servidor de aplicaciones. Incluye dentro del propio archivo las 17 fuentes priorizadas, sus nueve campos bibliográficos, los seis subtemas y las relaciones cruzadas verificadas utilizadas en el grafo.
+
+Puede servirse directamente desde cualquier hosting estático, incluido GitHub Pages. También puede abrirse como archivo HTML en un navegador moderno.
+
+La interfaz HTML5 incluye:
+
+- grafo SVG interactivo de las 17 fuentes;
+- búsqueda por título, autor, publicación u origen;
+- filtros por subtema y nivel;
+- citas directas verificadas y relación de versión equivalente;
+- nodos de los seis subtemas MECE;
+- zoom, desplazamiento y reposicionamiento de nodos;
+- panel de detalle con metadatos y enlace DOI/URL;
+- tabla completa del corpus maestro.
 
 ## Estructura del repositorio
 
-- `sources.csv`: **fuente maestra** del corpus. Contiene las 17 referencias y los metadatos bibliográficos utilizados por la aplicación.
-- `app.py`: aplicación Streamlit. Lee `sources.csv`, construye el grafo y consulta OpenAlex para enriquecer relaciones y referencias.
-- `requirements.txt`: dependencias de Python.
+- `index.html`: entrega HTML5 autónoma para navegador.
+- `sources.csv`: **fuente maestra** del corpus y referencia para mantenimiento de datos.
+- `app.py`: versión Streamlit enriquecida con consultas a OpenAlex.
+- `requirements.txt`: dependencias de la versión Streamlit.
 
 ## Esquema de `sources.csv`
 
@@ -22,39 +40,27 @@ El archivo usa nueve columnas estables:
 8. `origin`: documento del proyecto desde el que se incorporó la referencia.
 9. `level`: `Núcleo central` o `Complementaria`.
 
-`app.py` deriva automáticamente el identificador interno `A01`–`A17` a partir de `priority` y extrae el DOI desde `doi_url` cuando corresponde. De esta forma, los datos bibliográficos no quedan duplicados dentro del código.
+## Versiones de la visualización
 
-## Qué muestra la aplicación
+### HTML5
 
-- Grafo interactivo de las 17 fuentes.
-- Citas directas entre fuentes del corpus.
-- Acoplamiento bibliográfico: pares de fuentes que comparten referencias.
-- Relación de cada fuente con uno de seis subtemas MECE.
-- Tabla completa del corpus maestro, con publicación, DOI/URL, origen documental y nivel.
-- Cobertura y resolución bibliográfica en OpenAlex.
-- Referencias de una fuente seleccionada, recuperadas dinámicamente desde OpenAlex.
+Abrir `index.html` en un navegador o publicar el repositorio como sitio estático. Esta versión privilegia portabilidad: todos los datos necesarios para visualizar el corpus están embebidos en el HTML.
 
-## Ejecución
+### Streamlit / OpenAlex
 
-Requiere Python 3.10 o superior.
+La versión Python utiliza `sources.csv` como fuente de verdad y consulta OpenAlex para enriquecer referencias y calcular relaciones dinámicas.
 
 ```bash
 pip install -r requirements.txt
 streamlit run app.py
 ```
 
-## Fuentes y método
+## Relaciones representadas
 
-El corpus base contiene 17 fuentes priorizadas. `sources.csv` es la única fuente de verdad para sus metadatos. La aplicación valida al iniciar que existan exactamente 17 filas y que estén presentes las nueve columnas requeridas.
-
-La aplicación consulta OpenAlex en vivo para resolver cada trabajo mediante DOI o similitud de título, recuperar `referenced_works`, detectar citas directas dentro del corpus y calcular acoplamiento bibliográfico mediante intersección de referencias.
-
-La red distingue cuatro relaciones:
-
-- **Cita directa:** A referencia bibliográficamente a B.
-- **Acoplamiento bibliográfico:** A y B comparten N referencias; no implica que se citen entre sí.
+- **Cita directa verificada:** A referencia bibliográficamente a B.
+- **Versión equivalente:** una fuente cita una versión bibliográfica equivalente del mismo trabajo.
 - **Subtema:** clasificación analítica MECE del proyecto.
-- **Versión equivalente:** una fuente cita otra versión bibliográfica del mismo trabajo.
+- **Acoplamiento bibliográfico:** disponible en la versión Streamlit cuando OpenAlex devuelve listas de referencias.
 
 ## Subtemas MECE
 
@@ -65,10 +71,10 @@ La red distingue cuatro relaciones:
 - Gobernanza y capacidades
 - Asimetría adopción–gobernanza
 
-## Mantenimiento del corpus
+## Mantenimiento
 
-Para agregar, corregir o reclasificar fuentes, modifica únicamente `sources.csv`. Mientras el esquema de nueve columnas se conserve, `app.py` tomará los cambios automáticamente al reiniciar Streamlit.
+`sources.csv` continúa siendo la fuente maestra para modificaciones bibliográficas. Cuando el corpus cambie, la versión Streamlit lo leerá automáticamente; `index.html` debe regenerarse o actualizarse para reflejar el nuevo snapshot estático.
 
-## Notas
+## Nota metodológica
 
-OpenAlex puede no resolver algunas publicaciones recientes, capítulos o documentos no indexados. Por ello `app.py` conserva un conjunto reducido de citas cruzadas verificadas manualmente como fallback. El acoplamiento bibliográfico sólo se calcula cuando OpenAlex devuelve listas de referencias.
+La versión HTML5 muestra las relaciones cruzadas que habían sido verificadas para el corpus: ocho citas directas y una relación de versión equivalente. No inventa nuevas citas ni depende de una consulta externa al momento de visualizarse.
